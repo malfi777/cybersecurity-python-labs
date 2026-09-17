@@ -9,7 +9,7 @@ from shared.student import STUDENT_NAME, VARIANT_NUMBER
 
 
 def analyze_passwords():
-    """Аналізує надійність паролів згідно з критеріями варіанту."""
+    # аналізує надійність паролів згідно з критеріями варіанту
     print("--- Аналізатор паролів ---")
     print(f"Студент: {STUDENT_NAME}, Варіант: {VARIANT_NUMBER}\n")
 
@@ -32,16 +32,16 @@ def analyze_passwords():
         "require_special": True,
     }
     forbidden_passwords = {"pass", "root", "user", "1234", "admin123", "password"}
-    # генеруємо 3 випадкові індекси та додаємо дублікати[cite: 2]
+    # генеруємо 3 випадкові індекси та додаємо дублікати
     random_indices = random.choices(range(len(passwords)), k=3)
     for idx in random_indices:
         passwords.append(passwords[idx])
 
-    # вивід заголовку таблиці[cite: 2]
+    # вивід заголовку таблиці
     print(f"{'Пароль':<20} | {'Статус':<15}")
     print("-" * 38)
 
-    # аналіз кожного пароля[cite: 2]
+    # аналіз кожного пароля
     for pwd in passwords:
         has_lower = any(c.islower() for c in pwd)
         has_upper = any(c.isupper() for c in pwd)
@@ -58,7 +58,7 @@ def analyze_passwords():
 
         is_unique = passwords.count(pwd) == 1
 
-        # оцінка надійності за алгоритмом[cite: 2]
+        # оцінка надійності за алгоритмом
         if is_forbidden:
             status = "Заборонений"
         elif meets_all and len(pwd) >= criteria["min_length"] + 4 and is_unique:

@@ -6,13 +6,12 @@ import sys
 from datetime import datetime, timezone
 from functools import wraps
 
-# Додаємо шлях для імпорту даних студента[cite: 4]
+# додаємо шлях для імпорту даних студента
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 from shared.student import VARIANT_NUMBER
 
-# Параметри для Варіанту 4[cite: 4]
 MIN_PASSWORD_LENGTH = 14
-# Створюємо 5-символьну сіль з нулями зліва (для 4 варіанту -> "00004")[cite: 4]
+# створюємо 5-символьну сіль з нулями зліва (для 4 варіанту -> "00004")
 PERSONAL_SALT = f"{VARIANT_NUMBER:05d}"
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -25,7 +24,7 @@ class ValidationError(Exception):
 
 
 def generate_hash(password: str, salt: str = "00000") -> str:
-    """Генерує хеш від пароля та солі."""
+    # генерує хеш від пароля та солі
     if not password or not salt:
         raise ValueError("Пароль або сіль не можуть бути порожніми.")
     if len(password) < MIN_PASSWORD_LENGTH:
@@ -33,13 +32,13 @@ def generate_hash(password: str, salt: str = "00000") -> str:
             f"Пароль надто короткий. Мінімум {MIN_PASSWORD_LENGTH} символів."
         )
 
-    # Використання sha512 згідно з варіантом 4[cite: 4]
+    # використання sha512 згідно з варіантом 4
     combined = password + salt
     return hashlib.sha512(combined.encode()).hexdigest()
 
 
 def log_event(func):
-    """Декоратор для логування подій авторизації у JSON."""
+    # декоратор для логування подій авторизації у JSON
 
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -55,7 +54,6 @@ def log_event(func):
                 "event": "login",
                 "user": username,
                 "result": res_str,
-                # Виправлено DTZ005: додано timezone.utc
                 "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                 "args": [str(a) for a in args],
                 "kwargs": {k: str(v) for k, v in kwargs.items()},
@@ -73,7 +71,7 @@ def log_event(func):
                 with open(LOG_JSON_PATH, "w", encoding="utf-8") as f:
                     json.dump(logs, f, indent=4, ensure_ascii=False)
             except (OSError, PermissionError):
-                pass  # Пропускаємо запис, якщо файл недоступний
+                pass  # пропускаємо запис, якщо файл недоступний
 
         return result_val
 
@@ -81,13 +79,13 @@ def log_event(func):
 
 
 def create_user(username, password):
-    """Хешує пароль і повертає кортеж (логін, хеш)."""
+    # хешує пароль і повертає кортеж (логін, хеш)
     hash_value = generate_hash(password, PERSONAL_SALT)
     return username, hash_value
 
 
 def create_users(users_list):
-    """Створює базу даних у форматі CSV[cite: 4]."""
+    # cтворює базу даних у форматі CSV
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(USERS_CSV_PATH, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
@@ -102,32 +100,31 @@ def create_users(users_list):
 
 @log_event
 def login(username: str, password: str) -> bool:
-    """Перевіряє, чи існує користувач і чи збігається хеш."""
+    # перевіряє, чи існує користувач і чи збігається хеш
     if not username or not password:
         raise ValueError("Логін та пароль не можуть бути порожніми.")
 
     with open(USERS_CSV_PATH, mode="r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
-        # Виправлено PERF402: використання list() замість циклу
+        # використання list() замість циклу
         users_db = list(reader)
 
     input_hash = generate_hash(password, PERSONAL_SALT)
     for db_user in users_db:
-        # Виправлено SIM102: об'єднані умови if
         if db_user["login"] == username and db_user["password_hash"] == input_hash:
             return True
     return False
 
 
 def main():
-    """Головна функція для демонстрації роботи."""
+    # головна функція для демонстрації роботи
     print("--- Безпечне хешування, CSV-база та JSON-логування ---\n")
 
-    # Кортеж із 10 користувачів (деякі паролі коротші за 14 символів для перевірки помилки)[cite: 4]
+    # кортеж із 10 користувачів (деякі паролі коротші за 14 символів для перевірки помилки)
     users_to_register = (
         ("admin01", "SuperSecurePass1234"),
         ("dev_ops", "PasswordMustBe14Chars"),
-        ("guest01", "Short"),  # Викличе ValidationError
+        ("guest01", "Short"),
         ("analyst", "DataAnalyst2026Secure"),
         ("ceo_acc", "ExecutivePass2026!"),
         ("manager", "ManagerPass!14Chars"),
@@ -152,10 +149,10 @@ def main():
 
         print("\n[3] Тестування автентифікації та логування:")
         test_cases = [
-            ("admin01", "SuperSecurePass1234"),  # Правильно
-            ("student", "WrongPassword14Char"),  # Невірний пароль
-            ("unknown", "SomePass14Chars123"),  # Неіснуючий логін
-            ("", "PasswordMustBe14Chars"),  # Порожній логін (ValueError)
+            ("admin01", "SuperSecurePass1234"),
+            ("student", "WrongPassword14Char"),
+            ("unknown", "SomePass14Chars123"),
+            ("", "PasswordMustBe14Chars"),
         ]
 
         for u, p in test_cases:
@@ -168,7 +165,6 @@ def main():
 
         print("\n[4] Усі спроби входу були записані у log.json[cite: 4]")
 
-    # Виправлено BLE001: видалено загальний Except, залишено лише конкретні системні помилки
     except (OSError, FileNotFoundError, PermissionError) as e:
         print(f"Системна помилка під час роботи з файлами: {e}")
 

@@ -1,15 +1,14 @@
 import os
 import sys
 
-# Додаємо шлях до системного пошуку для імпорту спільного модуля
+# додаємо шлях до системного пошуку для імпорту спільного модуля
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 
 def check_access():
-    """Реалізує перевірку доступу користувачів до ресурсів."""
+    # реалізує перевірку доступу користувачів до ресурсів
     print("--- Система контролю доступу ---\n")
 
-    # Вхідні дані для Варіанту 4[cite: 3]
     users = {
         "ciso_office": {
             "role": "ciso",
@@ -59,23 +58,23 @@ def check_access():
     security_levels = ("Guest", "Employee", "Privileged", "Executive")
     blocked_users = {"legacy_sys", "malicious_user", "expired_guest"}
 
-    # Вивід списку ресурсів із текстовим рівнем безпеки[cite: 3]
+    # вивід списку ресурсів із текстовим рівнем безпеки
     print("Доступні ресурси системи:")
     for res_name, res_level in resources:
-        # Індексація кортежу починається з 0, тому res_level - 1
+        # індексація кортежу починається з 0, тому res_level - 1
         level_name = security_levels[res_level - 1]
         print(f" - {res_name}: {level_name} (Рівень {res_level})")
     print("\n" + "=" * 50 + "\n")
 
-    # Для перевірки алгоритму візьмемо існуючих користувачів та додамо неіснуючого
+    # для перевірки алгоритму візьмемо існуючих користувачів та додамо неіснуючого
     test_users = list(users.keys()) + ["non_existent_user"]
 
-    # Перевірка доступу кожного користувача до кожного ресурсу[cite: 3]
+    # перевірка доступу кожного користувача до кожного ресурсу
     for username in test_users:
         print(f"Перевірка доступу для користувача: {username}")
 
         for res_name, res_level in resources:
-            # Алгоритм перевірки доступу[cite: 3]
+            # алгоритм перевірки доступу
             if username not in users:
                 status = "DENY (User not found)"
             elif username in blocked_users:
