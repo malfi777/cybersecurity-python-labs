@@ -20,8 +20,7 @@ LOG_JSON_PATH = os.path.join(DATA_DIR, "log.json")
 
 
 class ValidationError(Exception):
-    """Власний виняток для валідації паролів."""
-
+    """власний виняток для валідації паролів."""
 
 def generate_hash(password: str, salt: str = "00000") -> str:
     # генерує хеш від пароля та солі

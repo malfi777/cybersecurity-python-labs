@@ -86,5 +86,93 @@
             "PasswordMustBe14Chars"
         ],
         "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-17 09:01:16",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-17 09:01:16",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-17 09:01:16",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-17 09:01:16",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-17 09:01:29",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-17 09:01:29",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-17 09:01:29",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-17 09:01:29",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
     }
 ]
