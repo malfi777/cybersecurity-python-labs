@@ -174,5 +174,225 @@
             "PasswordMustBe14Chars"
         ],
         "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-18 07:10:34",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-18 07:10:34",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-18 07:10:34",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-18 07:10:34",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-24 21:03:38",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:03:38",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:03:38",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:03:38",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-24 21:12:41",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:12:41",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:12:41",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:12:41",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-24 21:12:44",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:12:44",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:12:44",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:12:44",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "admin01",
+        "result": "success",
+        "timestamp": "2026-09-24 21:13:20",
+        "args": [
+            "admin01",
+            "SuperSecurePass1234"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "student",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:13:20",
+        "args": [
+            "student",
+            "WrongPassword14Char"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "unknown",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:13:20",
+        "args": [
+            "unknown",
+            "SomePass14Chars123"
+        ],
+        "kwargs": {}
+    },
+    {
+        "event": "login",
+        "user": "",
+        "result": "failure",
+        "timestamp": "2026-09-24 21:13:20",
+        "args": [
+            "",
+            "PasswordMustBe14Chars"
+        ],
+        "kwargs": {}
     }
 ]

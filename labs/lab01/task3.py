@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from shared.student import VARIANT_NUMBER
 
 MIN_PASSWORD_LENGTH = 14
-# створюємо 5-символьну сіль з нулями зліва (для 4 варіанту -> "00004")
+# створю 5-символьну сіль з нулями зліва 
 PERSONAL_SALT = f"{VARIANT_NUMBER:05d}"
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -31,7 +31,7 @@ def generate_hash(password: str, salt: str = "00000") -> str:
             f"Пароль надто короткий. Мінімум {MIN_PASSWORD_LENGTH} символів."
         )
 
-    # використання sha512 згідно з варіантом 4
+    # використання sha512 згідно з варіантом
     combined = password + salt
     return hashlib.sha512(combined.encode()).hexdigest()
 

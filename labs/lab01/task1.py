@@ -9,7 +9,7 @@ from shared.student import STUDENT_NAME, VARIANT_NUMBER
 
 
 def analyze_passwords():
-    # аналізує надійність паролів згідно з критеріями варіанту
+    # аналізує надійність паролів
     print("--- Аналізатор паролів ---")
     print(f"Студент: {STUDENT_NAME}, Варіант: {VARIANT_NUMBER}\n")
 
