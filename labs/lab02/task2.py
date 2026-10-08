@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# Використовуємо локальний логер (вимога Ruff)
+# Використовуємо локальний логер 
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +47,6 @@ def parse_auth_log(
     start_time = None
     end_time = None
 
-    # Виправлення Ruff: створюємо час з timezone
     current_year = datetime.now(timezone.utc).year
 
     try:
@@ -61,7 +60,6 @@ def parse_auth_log(
                     time_str = f"{current_year} {data['month']} {int(data['day']):02d} {data['time']}"
 
                     try:
-                        # Виправлення Ruff: додаємо tzinfo
                         timestamp = datetime.strptime(
                             time_str, "%Y %b %d %H:%M:%S"
                         ).replace(tzinfo=timezone.utc)
