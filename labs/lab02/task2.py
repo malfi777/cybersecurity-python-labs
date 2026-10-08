@@ -7,12 +7,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# Використовуємо локальний логер 
+# Ініціалізація системи логування для гарного виводу в консоль
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class AuthEvent:
+    # Структура для зберігання однієї спроби входу з журналу
     timestamp: datetime
     ip: str
     user: str
@@ -20,6 +21,7 @@ class AuthEvent:
 
 
 def setup_logging():
+    # Налаштування формату повідомлень (наприклад, [INFO] або [ERROR])
     logging.basicConfig(
         level=logging.INFO,
         format="[%(levelname)s] %(message)s",
@@ -29,34 +31,38 @@ def setup_logging():
 def parse_auth_log(
     log_path: Path, threshold: int, window_min: int, output_json: Path | None
 ):
+    # Перевірка наявності файлу логів
     if not log_path.exists():
         logger.error(f"Файл журналу не знайдено: {log_path}")
         return
 
     logger.info(f"Analyzing authentication events in {log_path}...")
 
+    # Регулярний вираз (шаблон) для пошуку часу, логіна, ІР та статусу (Failed/Accepted)
     log_pattern = re.compile(
         r"^(?P<month>[A-Z][a-z]{2})\s+(?P<day>\d+)\s+(?P<time>\d{2}:\d{2}:\d{2})\s+.*?"
         r"(?P<status>Failed|Accepted)\s+password\s+for\s+(invalid\s+user\s+)?(?P<user>\S+)\s+from\s+(?P<ip>\S+)"
     )
 
-    ip_events = defaultdict(list)
-    target_users = defaultdict(set)
+    # Словники для групування подій за ІР-адресами
+    ip_events = defaultdict(list)  # Зберігає всі спроби входу для конкретної ІР
+    target_users = defaultdict(set)  # Зберігає унікальні логіни, які перебирав хакер
 
     processed_lines = 0
     start_time = None
     end_time = None
-
     current_year = datetime.now(timezone.utc).year
 
     try:
+        # Читання файлу по рядках
         with log_path.open("r", encoding="utf-8") as file:
             for line in file:
                 processed_lines += 1
-                match = log_pattern.search(line)
+                match = log_pattern.search(line)  # Приміряємо шаблон до рядка
 
                 if match:
                     data = match.groupdict()
+                    # Форматування дати у зручний для обробки вигляд
                     time_str = f"{current_year} {data['month']} {int(data['day']):02d} {data['time']}"
 
                     try:
@@ -66,11 +72,13 @@ def parse_auth_log(
                     except ValueError:
                         continue
 
+                    # Фіксація початку і кінця часового діапазону всього журналу
                     if start_time is None or timestamp < start_time:
                         start_time = timestamp
                     if end_time is None or timestamp > end_time:
                         end_time = timestamp
 
+                    # Створення об'єкта події та додавання його у словник по цій ІР
                     ip = data["ip"]
                     user = data["user"]
                     status = data["status"]
@@ -85,6 +93,7 @@ def parse_auth_log(
         logger.error(f"Немає прав на читання файлу: {log_path}")
         return
 
+    # Вивід загальної статистики читання файлу
     if start_time and end_time:
         logger.info(
             f"Processed {processed_lines} lines (Time range: {start_time} - {end_time})"
@@ -100,13 +109,17 @@ def parse_auth_log(
     window_delta = timedelta(minutes=window_min)
     blocklist = []
 
+    # Аналіз зібраних даних для кожної ІР-адреси
     for ip, events in ip_events.items():
-        events.sort(key=lambda e: e.timestamp)
+        events.sort(key=lambda e: e.timestamp)  # Сортування спроб за часом
+
+        # Розділення вдалих і невдалих спроб
         failed_timestamps = [e.timestamp for e in events if e.status == "Failed"]
         accepted_timestamps = [e.timestamp for e in events if e.status == "Accepted"]
 
         max_in_window = 0
 
+        # Алгоритм "ковзного вікна": підрахунок кількості невдалих спроб за заданий час (напр. 5 хв)
         for i in range(len(failed_timestamps)):
             count = 1
             for j in range(i + 1, len(failed_timestamps)):
@@ -116,6 +129,7 @@ def parse_auth_log(
                     break
             max_in_window = max(max_in_window, count)
 
+        # Перевірка перевищення ліміту (детект брутфорсу)
         if max_in_window >= threshold:
             users_str = ", ".join(list(target_users[ip])[:5])
             if len(target_users[ip]) > 5:
@@ -126,6 +140,7 @@ def parse_auth_log(
             )
             blocklist.append(ip)
 
+            # Перевірка, чи вдалося хакеру успішно зайти ПІСЛЯ початку підбору паролів
             if failed_timestamps:
                 first_fail = failed_timestamps[0]
                 successful_breaches = [t for t in accepted_timestamps if t > first_fail]
@@ -134,6 +149,7 @@ def parse_auth_log(
                         f"COMPROMISE ALERT! Hacker from IP {ip} SUCCESSFULLY logged in after bruteforce attempts at {successful_breaches[-1]}!"
                     )
 
+    # Вивід результатів та експорт у файл
     if blocklist:
         logger.info("=== Recommended Blocklist (IPs) ===")
         for ip in blocklist:
@@ -141,6 +157,7 @@ def parse_auth_log(
 
         if output_json:
             try:
+                # Створення папки (якщо не існує) та збереження JSON
                 output_json.parent.mkdir(parents=True, exist_ok=True)
                 with output_json.open("w", encoding="utf-8") as f:
                     json.dump({"blocked_ips": blocklist}, f, indent=4)
@@ -152,6 +169,7 @@ def parse_auth_log(
 
 
 def main():
+    # Налаштування аргументів, які програма чекає з командного рядка
     parser = argparse.ArgumentParser(description="SSH Auth Log Bruteforce Detector")
     parser.add_argument(
         "--auth-log", type=Path, required=True, help="Шлях до файлу auth.log"
@@ -163,10 +181,13 @@ def main():
         "--window-min", type=int, default=5, help="Часове вікно у хвилинах"
     )
     parser.add_argument("--output-json", type=Path, help="Шлях до файлу звіту JSON")
+
+    # Зчитування аргументів
     args = parser.parse_args()
 
     setup_logging()
 
+    # Запуск головної функції аналізу з переданими параметрами
     parse_auth_log(
         log_path=args.auth_log,
         threshold=args.threshold,

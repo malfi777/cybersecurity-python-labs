@@ -5,6 +5,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
+# Кількість ітерацій для ускладнення злому пароля
 PBKDF2_ITERATIONS = 100000
 
 
@@ -14,36 +15,41 @@ class User:
     def __init__(
         self, username: str, email: str, role: str = "user", active: bool = True
     ):
-        # Забороняємо пусті логіни
         if not username or not username.strip():
             raise ValueError("Логін не може бути порожнім!")
 
         self.username = username
         self.role = role
         self.active = active
-        self._email = None
-        self.email = email
+        self._email = None  # Прихована змінна для email
+        self.email = email  # Виклик сіттера (перевірки) для email
+
+        # Інкапсуляція: суворо приховані змінні для паролів (з двома підкресленнями)
         self.__password_hash: bytes | None = None
         self.__password_salt: bytes | None = None
 
     @property
     def email(self) -> str:
+        # Дозволяє читати email як звичайну змінну
         return self._email
 
     @email.setter
     def email(self, value: str):
+        # Перевіряє формат email перед його збереженням
         pattern = r"^[a-zA-Z][a-zA-Z0-9.]{2,63}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(pattern, value):
             raise ValueError("Невірний формат email адреси")
         self._email = value
 
     def set_password(self, password: str):
+        # Генерація "солі" та криптографічного хешу замість збереження прямого пароля
         self.__password_salt = os.urandom(16)
         self.__password_hash = hashlib.pbkdf2_hmac(
             "sha256", password.encode("utf-8"), self.__password_salt, PBKDF2_ITERATIONS
         )
 
     def check_password(self, password: str) -> bool:
+        # Перевірка введеного пароля шляхом хешування і порівняння з оригіналом
         if not self.__password_hash or not self.__password_salt:
             return False
         test_hash = hashlib.pbkdf2_hmac(
@@ -52,6 +58,7 @@ class User:
         return hmac.compare_digest(self.__password_hash, test_hash)
 
     def deactivate(self):
+        # Вимкнення доступу користувачу
         self.active = False
 
     def __str__(self):
@@ -59,6 +66,7 @@ class User:
 
 
 class Admin(User):
+    # Наслідування: Admin отримує всі можливості User
     def __init__(
         self,
         username: str,
@@ -83,15 +91,18 @@ class Admin(User):
 
 
 class Session:
+    # Клас для контролю часу перебування користувача в системі
     def __init__(self, ip: str):
         self.ip = ip
         self.login_time = datetime.now(timezone.utc)
         self.last_activity = self.login_time
 
     def touch(self):
+        # Оновлення часу останньої активності
         self.last_activity = datetime.now(timezone.utc)
 
     def is_active(self, timeout_sec: int) -> bool:
+        # Перевірка, чи не минув дозволений час бездіяльності
         if timeout_sec <= 0:
             raise ValueError("Таймаут повинен бути додатнім числом")
         return (datetime.now(timezone.utc) - self.last_activity) <= timedelta(
@@ -101,12 +112,14 @@ class Session:
 
 @dataclass
 class AuditRecord:
+    # Структура для швидкого створення запису в журнал (час, логін, дія)
     timestamp: datetime
     username: str
     action: str
 
 
 class AuditLog:
+    # Журнал подій безпеки
     def __init__(self):
         self.records = []
 
@@ -122,7 +135,8 @@ class AuditLog:
 
 
 class UserAccount:
-    SESSION_TIMEOUT_SEC = 900
+    # Композиція: цей клас об'єднує User, Session та AuditLog
+    SESSION_TIMEOUT_SEC = 900  # 15 хвилин до автовиходу
 
     def __init__(self, user: User, audit_log: AuditLog | None = None):
         self.user = user
@@ -130,12 +144,15 @@ class UserAccount:
         self.audit_log = audit_log if audit_log else AuditLog()
 
     def login(self, username: str, password: str, ip: str) -> bool:
+        # Перевірка логіна
         if self.user.username != username:
             self.audit_log.add_log(username, "login_failure: unknown user")
             return False
+        # Перевірка статусу активації
         if not self.user.active:
             self.audit_log.add_log(username, "login_failure: account deactivated")
             return False
+        # Перевірка пароля та створення сесії
         if self.user.check_password(password):
             self.session = Session(ip)
             self.session.touch()
@@ -146,6 +163,7 @@ class UserAccount:
             return False
 
     def is_authenticated(self) -> bool:
+        # Перевірка наявності сесії та її валідності за часом
         return bool(self.session and self.session.is_active(self.SESSION_TIMEOUT_SEC))
 
     def logout(self):
@@ -154,6 +172,7 @@ class UserAccount:
             self.session = None
 
     def __getitem__(self, key: str):
+        # Дозволяє звертатися до атрибутів через account['ключ']
         if key == "user":
             return self.user
         elif key == "session":
@@ -161,10 +180,12 @@ class UserAccount:
         elif key == "audit_log":
             return self.audit_log
         elif "password" in key:
+            # Захист від витоку пароля
             raise KeyError("Доступ до хешу/солі пароля заборонено з міркувань безпеки")
         raise KeyError(f"Невідомий ключ: {key}")
 
     def __setitem__(self, key: str, value):
+        # Дозволяє змінювати атрибути, але з суворою перевіркою типів даних
         if key == "user":
             if not isinstance(value, User):
                 raise TypeError("Очікується об'єкт типу User")
