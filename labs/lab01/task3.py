@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from shared.student import VARIANT_NUMBER
 
 MIN_PASSWORD_LENGTH = 14
-# створю 5-символьну сіль з нулями зліва 
+# створю 5-символьну сіль з нулями зліва
 PERSONAL_SALT = f"{VARIANT_NUMBER:05d}"
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -21,6 +21,7 @@ LOG_JSON_PATH = os.path.join(DATA_DIR, "log.json")
 
 class ValidationError(Exception):
     """власний виняток для валідації паролів."""
+
 
 def generate_hash(password: str, salt: str = "00000") -> str:
     # генерує хеш від пароля та солі
@@ -131,6 +132,7 @@ def main():
         ("tester1", "TestTesting123456"),
         ("sys_bot", "BotAutoPassw0rd99"),
         ("auditor", "AuditPassSecur1ty"),
+        ("", "AuditPassSecur1ty"),
     )
 
     try:

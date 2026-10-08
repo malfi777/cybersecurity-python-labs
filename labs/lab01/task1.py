@@ -24,6 +24,7 @@ def analyze_passwords():
         "1234",
         "Elite@Secur1ty",
         "admin123",
+        "12348719237",
     ]
     criteria = {
         "min_length": 7,
