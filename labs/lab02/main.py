@@ -19,6 +19,12 @@ def demo():
     admin_user.set_password("SuperSecret123!")
     print(admin_user)
 
+    New_admin_user = Admin("root_admin2", "admin1.01@lpnu.ua", {"read", "write"})
+    New_admin_user.set_password("SuperSecret123!4")
+    New_admin_user.grant_permission("manage_users")
+    
+    print(New_admin_user)
+
     # Додаємо нове право та перевіряємо його наявність
     admin_user.grant_permission("delete")
     print(f"Чи має admin право 'delete'? {admin_user.has_permission('delete')}")
